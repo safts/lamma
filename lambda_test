@@ -1,0 +1,9 @@
+((lamBD krgl000ii) (\x.xAOS))
+\x.a x
+\x.(\y.y y) a x
+(\x.\y.x x (\y.x x y) y) y
+(\p. (\q. p q p)) (\p. (\q. p p q))
+And True True
+And True False
+Add 1 1
+\n.n (\g.\k.IsZero (g 1) k (Add (g k) 1)) (\v.0) 0

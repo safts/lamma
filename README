@@ -1,0 +1,74 @@
+1 Syntax
+
+lcin supports the syntax of λ-calculus enriched with integers, identifiers and operators.
+The supported language is described by the following grammar:
+
+Term → var
+     | ( Term Oper Term )
+     | ( λ var . Term )
+     | num
+     | id
+Oper → op
+     | ε
+
+The symbol λ can be written as '\'.
+var and id are arbitary strings of latin characters (uppercase or lowercase), numbers and underscores. However var must start with a lowercase or underscore, while id
+must start with an uppercase.
+Finally parentheses can be
+avoided according to the following rules
+• Outmost parentheses can be avoided
+• Application is left-associative
+• The scope of an abstraction extends as far to the right as possible
+• Terms that contain operators are parsed according to the precedence and associativity of these operators (see section 6).
+
+
+
+
+2 Basic function
+
+lcin is an interactive program. When executed it displays the >> prompt and
+waits for user input. The most simple usage is to enter a λ-term and press return.
+The program performs all β and η reductions and generates the term’s normal
+form. The result is printed in a “readable” way, that is only the necessary
+parentheses are displayed, church numerals are displayed as integers.
+Terms are reduced using the normal order evaluation strategy, that is the
+leftmost β or η reduction is performed first. This strategy guarantees that term’s
+normal form will be computed in finite time, if it exists. However if a term has no
+normal form then execution will not terminate. After the execution the program
+displays the number of reductions that were performed and the CPU usage time.
+
+
+
+
+3 Integers
+
+lci supports integers by encoding them as church numerals during parsing.
+Integer n will be converted to
+c_n ≡ λf.λx.f^n (x)
+So, actually, it is just a syntactic sugar. All operations are implemented in
+pure λ-calculus and can be used through identifiers and operators. Although the
+use of calculus for ordinary operations is sleek, it has has a serious performace
+drawback. The complexity of an operation is far from constant, for example the
+power-of operator (**) requires an exponential number of reductions.
+
+
+
+
+4 Identifiers
+
+Identifiers are used to represent big λ-terms by defining aliases. For example term
+λx.x can be assigned to alias I so that the term I y is equivalent to (λx.x) y.
+Aliases must be defined in a file that is read by the program. The file contains 
+
+Command id = Term assings Term to identifier id while command ? Term
+causes the evaluation of Term just as if it was entered interactively. File processing
+is made using the following command
+Consult ’file’
+When being started, lcin searches for a file named .lcin_aliases in the src/ place.
+This file contains definitions for many basic functions and operators
+(integer operations, for expample) and is similar to Haskell’s prelude.hs.
+Identifiers are replaced by the corresponding terms during evaluation and
+not during parsing. Thus the order of the definitions is not significant. If an
+alias is not defined an error message is displayed during evaluation. If no alias
+contains itself (directly or indirectly) then aliases are just a syntactic sugar, for
+if we replace all of them we get valid λ-terms.

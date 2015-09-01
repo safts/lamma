@@ -1,0 +1,68 @@
+# Initialization file for lcin program.
+# This file declares basic functions and operators.
+
+# Operator definition.
+
+'&&' = And;
+'||' = Or;
+'==' = Equal;
+'!=' = \a.\b.Not (a == b);
+'>=' = Geq;
+'<=' = Leq;
+'>' = \a.\b.Not (a <= b);
+'<' = \a.\b.Not (a >= b);
+'+' = Add;
+'-' = Monus;
+'*' = Mult;
+'/' = \n.\m.If (n < m) 0 (1+((n-m)/m));
+'^' = Exp;
+',' = Pair;
+
+# --- Fixed point combinators -----------------------------------------
+
+Fact = \f.\n. If (n == 0) 1 (n*(f(n-1)));
+
+Y = \f.(\x.f(x x))(\x.f(x x));
+Theta = (\x.\y.y (x x y))(\x.\y.y (x x y));
+
+# --- Logical functions -----------------------------------------------
+
+True = \x.\y.x;
+False = \x.\y.y;
+Not = \z.z False True;
+And = \x.\y.(x (y True False) False);
+Or = \x.\y.(x True (y True False));
+If = \z.\x.\y.z x y;
+
+# --- Arithmetic functions --------------------------------------------
+
+Succ = \n.\f.\x.n f(f x);
+Pred = \x.\y.\z.x(\p.\q.q(p y))(\y.z)(\x.x);
+Add = \n.\m.\f.\x.n f(m f x);
+Mult = \n.\m.\f.n(m f);
+Exp = \n.\m.m n;
+Monus = \a.\b.b Pred a;
+
+#IsZero = \x.x (\x.\z.z False x) (\x.x) True;
+IsZero = \n.n (\x.False) True;
+Equal = \a.\b.(IsZero (Monus a b)) && (IsZero (Monus b a));
+Leq = \a.\b.IsZero (Monus a b);
+Geq = \a.\b.IsZero (Monus b a);
+
+# --- Pairs -----------------------------------------------------------
+
+Pair = \x.\y.\z.z x y;
+Fst = \z.z True;
+Snd = \z.z False;
+
+# --- List construction -----------------------------------------------
+
+Cons = \x.\y.\s.s x y;
+Nil = \x.True;
+IsNil = \p.p \x.\y.False;
+Head = \p.p True;
+Tail = \p.p False;
+
+# --- Infinite recursion ----------------------------------------------
+
+Loop = Loop;

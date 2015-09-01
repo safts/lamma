@@ -1,0 +1,18 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {subsection}{\numberline {1.1}Description}{3}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Supported Features}{3}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Basic Features}{3}{subsubsection.1.2.1}
+\contentsline {subsubsection}{\numberline {1.2.2}Numerals}{3}{subsubsection.1.2.2}
+\contentsline {subsubsection}{\numberline {1.2.3}Identifiers}{4}{subsubsection.1.2.3}
+\contentsline {subsubsection}{\numberline {1.2.4}Operators}{4}{subsubsection.1.2.4}
+\contentsline {section}{\numberline {2}Installation}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}Dependencies}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Compilation}{5}{subsection.2.2}
+\contentsline {section}{\numberline {3}Usage}{5}{section.3}
+\contentsline {subsection}{\numberline {3.1}Command-line input}{6}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Input through file}{6}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Tracing}{6}{subsection.3.3}
+\contentsline {section}{\numberline {4}Implementation Details}{6}{section.4}
+\contentsline {subsection}{\numberline {4.1}Parsing - Semantics - Representation}{6}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Evaluation Strategy}{6}{subsection.4.2}

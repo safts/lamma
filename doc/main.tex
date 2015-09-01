@@ -1,0 +1,211 @@
+\documentclass[a4paper]{article}
+
+\usepackage[greek,english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\newcommand{\shellcmd}[1]{\indent\indent\texttt{\footnotesize\# #1}}
+\newcommand{\lc}{\textgreek{λ}-calculus\ }
+\newcommand{\la}{\textgreek{λ}}
+\newcommand{\intr}{\textgreek{λ}lama\ }
+
+
+
+\lstset{
+  basicstyle=\itshape,
+  xleftmargin=3em,
+  literate={->}{$\Rightarrow$}{2}
+           {α}{$\alpha$}{1}
+           {λ}{$\lambda$}{1}
+}
+
+\title{\textgreek{λ}lama. - Lambda Calculus Interpreter}
+
+
+\author{  
+	Giannakopoulos Anastasios \\
+  \texttt{sdi0900053@di.uoa.gr}
+  \and
+  Aftsidis Sergios\\
+  \texttt{sdi0900052@di.uoa.gr}\\ \\
+  Deparment of Informatics and Telecommunications\\
+  University of Athens\\
+  Greece
+}
+
+
+\begin{document}
+\maketitle
+~\\
+~\\ \\ \\ \\
+\centerline{\includegraphics[scale=0.4]{llama_logo.jpg}}
+\pagebreak
+\tableofcontents
+\pagebreak
+
+\section{Introduction}
+This document describes the \intr \lc interpreter. This is a project implemented by Giannakopoulos Anastasios and Aftsidis Sergios as an assignment in an undergraduate course, "\textit{Principles of Programming Languages}". This document will guide you through everything you will need to use the interpreter, from the really basic aspects  (compiling and running the program, running simple (or even more advanced) \la-terms) to theoretical / technical specifics about the implementation (evaluation strategy / implementation details).
+
+
+\subsection{Description}
+\intr is a \lc interpreter which (though minimal) is quite powerful. It has a simple interface which makes it easy and quick to learn. 
+
+
+\subsection{Supported Features}
+\subsubsection{Basic Features}
+\intr supports all the basic \lc features. It follows the commonly used \la-term syntax, which is
+\\
+\begin{lstlisting}
+term ::== var               // variable
+       |  (term) (term)     // application
+       |  λ(var).(term)     // abstraction
+\end{lstlisting}
+
+
+\par Here, $var$ represents a variable, which is a sequence of letters 
+starting with a lower-case letter (e.g. x, xYY, x\_01 but \textbf{not} X). The cases of $variable$ and $application$ are really straightforward, so lets focus on $abstraction$. A legal abstraction syntax can be
+
+%
+\begin{displaymath}
+\backslash(var) . (BODY)
+\end{displaymath}
+%
+where "var" is the abstraction variable, eg. $x$ and $BODY$ is the body of the \la-term. So, a valid \la-term would be $\backslash x . x$. You can of course compose more complex terms, such as $\backslash x. x \backslash y\ .y\ z$ \\ 
+
+\noindent \textbf{\textit{Q}}:\ How is this term interpreted? \\ 
+Following the standard \lc conventions, this is interpreted as $\backslash x.(\ x\ (\backslash y.(y\ z)))$. \textit{(The abstraction rule extends the furthest possible to the right)}
+~\\ \\
+\noindent \textbf{\textit{Q}}:\ How can a user choose the how the term will be displayed? \\ 
+By entering the command $:par\ on$ the user specifies that the term will be displayed using all the possible parenthesis. By choosing $:par\ off$, only the required parenthesis will be displayed.
+
+\subsubsection{Numerals}
+
+\lc supports numbers, known as $Church\ Numerals$. \intr supports $Church\ Numerals$, but also integers in the form we know them. For example, one can represent the number 3 both as $(\backslash f.\backslash x \ f(f(f\ x)))$ and 3.
+
+\subsubsection{Identifiers}
+\intr also supports user-defined identifiers. Identifiers can be used to make \lc more practical, as they provide a level of abstraction from \la-terms to a more humanly readable context. So, the interpreter also processes expressions like
+
+\begin{displaymath}
+And\ True\ False
+\end{displaymath}
+
+which outputs $False$ (\textit{Actually}, the output is \textit{0}, but the Church Numeral for 0 is $\backslash f.\backslash x.\ x$, which is also the \textit{False} identifier). 
+~\\ \\
+One can really see the power of identifiers in examples like the following:
+
+\begin{displaymath}
+Add\ (Minus\ 34\ 5)\ (Mult\ 3\ 12) 
+\end{displaymath}
+
+Such a \la-term would take up more than two lines to write, and it is really easy to make a mistake while composing it.
+\\ \\ 
+\noindent \textbf{\textit{Q}}:\ How can a user define custom identifiers? \\ 
+By using the $store$ command. After entering $:store$ (followed by "\textit{Enter}") the user can assign custom Identifiers (starting with an uppercase letter), following the syntax \textit{Identifier = Term}.
+\\ \\
+\noindent \textbf{\textit{Q}}:\ Where is the list with the pre-defined identifiers? \\ 
+The full list with the identifiers pre-loaded with \intr is in the file \\ $./src/.llama\_aliases$
+
+\subsubsection{Operators}
+
+\intr also supports numeric operators, with their infix notation. So the above expression can be also written as $(34 - 5) + (3 * 12)$. Also, the operators follow the conventional operator priority, so the above expression can also be written as $34-5+3*12$.
+In order to account for operators, the grammar has been modified as such
+\begin{lstlisting}
+term ::== var                  // variable
+       ...
+       |  (term) OP (term)     // OP = operator
+\end{lstlisting}
+~\\ \\ 
+\noindent \textbf{\textit{Supported Operators}}:\ \\ 
+
+\begin{itemize}
+\item \textbf{Arithmetic Operators}: "+" , "-" , "*" , "/" ,"$\wedge $" (exponential), "$<$" ,"$\leq $", "$>$", "$\geq $
+\item \textbf{Logical Operators}: "\&\&" (And), "$\mid \mid$" (Or), "==" (Equal), "!=" (Not Equal)
+\end{itemize}
+\section{Installation}
+\subsection{Dependencies}
+
+\intr requires $Flex$ and $Bison$ to compile entirely from source. In case these utilities are not installed, you can build directly from the files generated from them (see section below). Also \textit{g++} is required to compile the source files. This implementation has been developed to for Linux systems.
+
+\subsection{Compilation}
+
+To use the application, you must first extract and compile it. To extract, navigate to the directory where the compressed file is and execute
+\\ \\ 
+\shellcmd{tar -xf llama.tar.gz}
+\\ \\
+For easier compilation, a $makefile$ is included. To compile using the automatically created $Flex$ and $Bison$ files \textit{(recommended)}, use the commands
+\\ \\ 
+\shellcmd{cd ./llama}\\
+\shellcmd{make llama}
+\\
+
+If, however, you want to create again the automatically generated files from $Flex$ and $Bison$, you can use the commands
+~\\ \\
+\shellcmd{cd ./llama/src}~\\
+\shellcmd{make parser.cpp}\\
+\shellcmd{make parser.hpp}\\
+\shellcmd{make tokens.cpp}\\
+\shellcmd{cd ..}\\
+\shellcmd{make llama}\\
+\\
+
+In order to make the interpreter more functional, we have included a wrapping utility, which adds some really convenient functionality, e.g. using the up and down arrow keys you can see previously entered commands, using the left - right arrow keys you can navigate through the term you are composing, entering a right a parenthesis will highlight the matching left one etc. This utility must also be extracted and compiled. To do so, enter the following commands
+\\ \\
+\shellcmd{tar -xf rlwrap-0.30.tar.gz} \\
+\shellcmd{make rlwrap}
+\\
+\section{Usage}
+
+This section describes the usage of \intr . Wherever the $executable$ file is referenced, you should replace it with the name of the executable you are using. If you are using the wrapped version, then replace it with \intr$-rlwrap$, otherwise with \intr
+
+~\\ \\ 
+
+If at any time the user needs information, there is a help message brought up by the $:help$ command.
+
+\subsection{Command-line input}
+
+Executing the command 
+
+~\\ 
+\shellcmd{./executable}
+\\ 
+
+will start the interpreter in command line mode. In this mode you can type the terms you want and interpret them real time.
+
+\subsection{Input through file}
+
+Executing the command 
+
+~\\  
+\shellcmd{./executable inputFile}
+\\ 
+
+will start the interpreter in file input mode. In this mode the terms from $inputFile$ will be interpreted first, and then you are redirected to command line mode.
+
+
+\subsection{Tracing}
+
+\intr provides a tracing functionality. This allows the user to trace all the reductions done while evaluating a \la-term one by one. To enable tracing, use the command $:trace\ on$. To disable it, use $:trace\ off$. When tracing, the interpreter each time executes a reduction and then waits for user input ($Enter$).
+
+\section{Implementation Details}
+\subsection{Parsing - Semantics - Representation}
+
+As previously mentioned, lexing and parsing are handled using the $Flex$ and $Bison$ lexer and parser. $Flex$ recognizes the input and returns the corresponding tokens to $Bison$, which in turn creates the syntax tree. This tree represents the \la-term we are evaluating and this is the data structure on which we are performing evaluations.
+
+\subsection{Evaluation Strategy}
+
+There are several evaluation strategies in \lc, but only \textit{Normal Order Evaluation} strategy 
+(see \href{http://en.wikipedia.org/wiki/Reduction_strategy\_\%28lambda\_calculus\%29}{here}) 
+guarantees that we will definitely reach the term's normal form (\textit{if} it exists). So, this strategy is implemented. This strategy can be roughly described as: \textit{\textbf{Always} choose the leftmost \textgreek{β}-redex} first.
+
+
+
+\end{document}
+
